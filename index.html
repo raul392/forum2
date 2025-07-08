@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Fórum Paranoia 1996</title>
+  <style>
+    body {
+      background-color: black;
+      color: lime;
+      font-family: "Courier New", monospace;
+      padding: 20px;
+    }
+
+    h1 {
+      color: cyan;
+      text-align: center;
+    }
+
+    .post {
+      border: 1px dashed lime;
+      margin-bottom: 10px;
+      padding: 10px;
+    }
+
+    input, textarea, button {
+      background-color: black;
+      color: lime;
+      border: 1px solid lime;
+      font-family: "Courier New", monospace;
+      padding: 5px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      background-color: lime;
+      color: black;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fórum Paranoia Online</h1>
+
+  <form id="formulario">
+    <input type="text" id="nome" placeholder="Seu nome (ou codinome)" required><br>
+    <textarea id="mensagem" rows="4" placeholder="Escreva sua paranoia..." required></textarea><br>
+    <button type="submit">Postar</button>
+  </form>
+
+  <hr>
+
+  <div id="posts"></div>
+
+  <!-- Firebase via script moderno (type="module") -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTV7884wgeOehCx6vmS534BhErGRNeZ60",
+      authDomain: "forum-paranoia-1996.firebaseapp.com",
+      databaseURL: "https://forum-paranoia-1996-default-rtdb.firebaseio.com",
+      projectId: "forum-paranoia-1996",
+      storageBucket: "forum-paranoia-1996.firebasestorage.app",
+      messagingSenderId: "685340548955",
+      appId: "1:685340548955:web:058480b94a7da1a701447e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const postsRef = ref(db, 'posts');
+
+    const form = document.getElementById('formulario');
+    const nome = document.getElementById('nome');
+    const mensagem = document.getElementById('mensagem');
+    const postsDiv = document.getElementById('posts');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      push(postsRef, {
+        nome: nome.value,
+        mensagem: mensagem.value
+      });
+      mensagem.value = '';
+    });
+
+    onChildAdded(postsRef, function (snapshot) {
+      const post = snapshot.val();
+      const div = document.createElement('div');
+      div.className = 'post';
+      div.innerHTML = `<strong>${post.nome}</strong><br>${post.mensagem}`;
+      postsDiv.prepend(div);
+    });
+  </script>
+</body>
+</html>
